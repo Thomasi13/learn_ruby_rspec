@@ -1,20 +1,47 @@
 
-def translate(word)
-  if word.start_with?('a','e','i','o','u')
-    word<<'ay'
-  else
-    pos=nil
-    ['a','e','i','o','u'].each do |vowel|
-      pos = word.index(vowel)
-      break unless pos.nil?
-    end
-    unless pos.nil?
-      pre = word.partition(word[pos,1]).first
-      word.slice!(pre)
-      word<<pre+'ay'
+def translate(sent)
+    sent = sent.downcase
+    vowels = ['a', 'e', 'i', 'o', 'u']
+    words = sent.split(' ')
+    result = []
+
+words.each_with_index do |word, i|
+    translation = ''
+    qu = false
+    if vowels.include? word[0]
+        translation = word + 'ay'
+        result.push(translation)
     else
-      #code to be executed when no vowels are there in the word
-      #eg words fry,dry
+        word = word.split('')
+        count = 0
+        word.each_with_index do |char, index|
+            if vowels.include? char
+              
+                if char == 'u' and translation[-1] == 'q'
+                    qu = true
+                    translation = words[i][count + 1..words[i].length] + translation + 'uay'
+                    result.push(translation)
+                    next
+                end
+                break
+            else
+                if char == 'q' and word[i+1] == 'u'
+                    qu = true
+                    translation = words[i][count + 2..words[i].length] + 'quay'
+                    result.push(translation)
+                    next
+                else
+                    translation += char
+                end
+                count += 1
+            end
+        end
+        if not qu
+            translation = words[i][count..words[i].length] + translation + 'ay'
+            result.push(translation)
+        end
     end
-  end
+
+end
+result.join(' ')
 end
